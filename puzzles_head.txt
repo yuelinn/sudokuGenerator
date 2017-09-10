@@ -1,0 +1,36 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<title>Sudoku</title>
+		<style>
+			table
+			{
+				border-collapse: collapse;
+				border: 5px solid black;
+
+			}
+			td, th 
+			{
+			    border: 1px solid #dddddd;
+			    text-align: center;
+   				padding: 8px;
+   				width:60px;
+  				height:60px;
+
+			}
+			tr:nth-child(3n) 
+			{
+			    border-bottom: 2px solid black;
+			}
+			td, th:nth-child(3n) 
+			{
+				border-right: 2px solid black;
+			}
+
+
+		</style>
+	</head>
+
+	<body style='text-align:center;'>
+
+		<h1>Level: 
