@@ -23,12 +23,11 @@ int main()
 
 	fileOpen(level, "final_puzzles.html");
 	fileOpen(level, "solutions.html");
-	// seed = 0;
+	srand(time(NULL) % 1000);
 
 	for(int i = 0; i < numOfPuzzles; ++i)
 	{
 		generateSeed(rand());
-		// seed += 500;
 
 		switch(level)
 		{
@@ -61,6 +60,7 @@ int main()
 
 		while((rand()%2 || rand()%2) && i < numOfPuzzles)
 		{
+			srand(time(NULL));
 			permutate(rand());
 			// send to print
 			subFile(i+1, "final_puzzles.html");
