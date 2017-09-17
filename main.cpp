@@ -15,7 +15,8 @@ int main()
 	int tempGrid[9][9]; 
 	// int seed;
 
-	cout << "input level: 1 = easy, 2 = medium, 3 = hard" << endl;  // check if the level is valid !!
+	cout << "input level: 0 = very easy, 1 = easy, 2 = medium, 3 = hard, 4 = evil" << endl;  
+	// check if the level is valid !!!
 	cin >> level;
 
 	cout << "input number of puzzles required" << endl;
@@ -24,13 +25,15 @@ int main()
 	fileOpen(level, "final_puzzles.html");
 	fileOpen(level, "solutions.html");
 	srand(time(NULL) % 1000);
+	int seed = 0;
 
 	for(int i = 0; i < numOfPuzzles; ++i)
 	{
-		generateSeed(rand());
+		seed = generateSeed(seed);
 
 		switch(level)
 		{
+			case 0:
 			case 1:
 			{
 				numOfSpaces = remove_boxes(rand()%30 + 20);
@@ -42,6 +45,7 @@ int main()
 				break;
 			}
 			case 3:
+			case 4:
 			{
 				numOfSpaces = remove_boxes(55);
 				break;
@@ -55,7 +59,7 @@ int main()
 		{
 			// redo
 			i--;
-			break;
+			continue;
 		}
 
 		while((rand()%2 || rand()%2) && i < numOfPuzzles)
@@ -63,10 +67,10 @@ int main()
 			srand(time(NULL));
 			permutate(rand());
 			// send to print
-			subFile(i+1, "final_puzzles.html");
+			subFile(i+1, "final_puzzles.html", level);
 			copyGrid(grid, tempGrid);
 			solve();
-			subFile(i+1, "solutions.html");
+			subFile(i+1, "solutions.html", level);
 			copyGrid(tempGrid, grid);
 
 			i++;

@@ -322,31 +322,35 @@ bool twinExclusion(int numOfChildren = 2)
 							// need to find more for more numofchildren !!!
 							{
 								// found the twin
-								hasDoneSomething = true;
+								
 								// remove other valids from the two squares
 								int len = guesses.valids[i][j].size(); // seg fault!!!
 								for(int n = 0; n < len ; ++n)
 								{
-									if(guesses.valids[i][j][n] != overlaps[l].digit &&  guesses.valids[i][j][n] != overlaps[m].digit)
+									if(guesses.valids[i][j][n] != overlaps[l].digit 
+										&&  guesses.valids[i][j][n] != overlaps[m].digit)
 									{
 										// not the twin
 										guesses.valids[i][j].erase(guesses.valids[i][j].begin() + n);
 										len--;
 										n--;
+										hasDoneSomething = true;
 									}
 								}
 								len = guesses.valids[overlaps[l].row][overlaps[l].col].size();
 								for(int n = 0; n < len ; ++n)
 								{
-									if(guesses.valids[overlaps[l].row][overlaps[l].col][n] != overlaps[l].digit &&  guesses.valids[overlaps[l].row][overlaps[l].col][n] != overlaps[m].digit)
+									if(guesses.valids[overlaps[l].row][overlaps[l].col][n] != overlaps[l].digit 
+										&&  guesses.valids[overlaps[l].row][overlaps[l].col][n] != overlaps[m].digit)
 									{
 										// not the twin
 										guesses.valids[overlaps[l].row][overlaps[l].col].erase(guesses.valids[overlaps[l].row][overlaps[l].col].begin() + n);
 										len--;
 										n--;
+										hasDoneSomething = true;
 									}
 								}
-								// break; //idk this breaks a diff loop... >< ?!
+								break; //idk this breaks a diff loop... >< ?!
 							}
 					}
 					
@@ -361,6 +365,127 @@ bool twinExclusion(int numOfChildren = 2)
 	return hasDoneSomething;
 }
 
+bool triplet(void)
+{
+	bool hasDoneSomething = false;
+
+	// write this later, not very common !!
+
+	return hasDoneSomething;
+}
+
+bool alternatePairEx()
+{
+	bool hasDoneSomething = false;
+	int tempGrid[9][9] = {0};
+	int digits[10] = {0};
+	std::vector<int> tempValids[9][9] = guesses.valids;
+
+	copyGrid(grid, tempGrid);
+
+	for(int i = 0; i < 2; ++i)
+	{
+		for(int j = 0; j < 2; ++j)
+		{
+			if(guesses.valids[i][j].size() == 2)
+			{
+				for(int k = 0; k < 2; ++k)
+				{
+					digits[guesses.valids[i][j][k]] ++;
+				}
+			}
+		}
+	}
+	
+	int mostCommonDigit = 0;
+	for(int i = 0; i < 10; ++i)
+	{
+		if(digits[i] > mostCommonDigit)
+			mostCommonDigit = i;
+	}
+
+	for(int i = 0; i < 2 && !hasDoneSomething; ++i)
+	{
+		for(int j = 0; j < 2 && !hasDoneSomething; ++j)
+		{
+			if(guesses.valids[i][j].size() == 2)
+			{
+				for(int k = 0; k < 2 && !hasDoneSomething; ++k)
+				{
+					if(guesses.valids[i][j][k] == mostCommonDigit)
+					{
+						grid[i][j] = mostCommonDigit;
+						Entree space;
+						space.row = i;
+						space.col = j;
+						space.digit = grid[i][j];
+						guesses.updateValid(space);
+
+						// check if guess is valid
+						while(subGpExclusion() || onlySquare() || basicElimination() || twinExclusion());
+						if(alreadySolved())
+						{
+							hasDoneSomething = true;
+							break;
+						}
+						else
+						{
+							// reset grid
+							copyGrid(tempGrid, grid);
+
+							// reset valids
+							for(int m = 0; m < 9; ++m)
+							{
+								for(int n = 0; n < 9; ++n)
+								{
+									guesses.valids[m][n].clear();
+									for(unsigned int l = 0 ; l < tempValids[m][n].size(); ++l)
+										guesses.valids[m][n].push_back(tempValids[m][n][l]);
+								}
+							}
+
+							// try the other digit !!! change this ot a separate function for modularity
+							grid[i][j] = guesses.valids[i][j][abs(k - 1)];
+							Entree space;
+							space.row = i;
+							space.col = j;
+							space.digit = grid[i][j];
+							guesses.updateValid(space);
+
+							// check if guess is valid
+							while(subGpExclusion() || onlySquare() || basicElimination() || twinExclusion());
+							if(alreadySolved())
+							{
+								hasDoneSomething = true;
+								break;
+							}
+							else
+							{
+								// reset grid
+								copyGrid(tempGrid, grid);
+
+								// reset valids
+								for(int m = 0; m < 9; ++m)
+								{
+									for(int n = 0; n < 9; ++n)
+									{
+										guesses.valids[m][n].clear();
+										for(unsigned int l = 0 ; l < tempValids[m][n].size(); ++l)
+											guesses.valids[m][n].push_back(tempValids[m][n][l]);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return hasDoneSomething;
+}
+
+
+
 int decideLevel(int numOfSpaces)
 {
 	int level = 0;
@@ -368,7 +493,7 @@ int decideLevel(int numOfSpaces)
 	copyGrid(grid, tempGrid);
 
 	// check range of empty spots for each level; bigger num of spaces = easier
-	if(numOfSpaces >= 45)
+	if(numOfSpaces >= 45) 
 	{
 		if(numOfSpaces <= (81-35))
 			level = 1;
@@ -439,35 +564,45 @@ int decideLevel(int numOfSpaces)
 	// check techniques used:
 	// logical techniques from: http://www.sudokudragon.com/sudokustrategy.htm
 	// score from: https://www.sudokuoftheday.com/about/difficulty/
-	// int logicScore = 0;
-	// get valid candidates in 3d vector in spaces
-	guesses.fillValids();
 
-	if(basicElimination() || onlySquare())
-		level += 1;
+	guesses.fillValids();  // get valid candidates in 3d vector in spaces
+
+	basicElimination(); // level 0;
+	onlySquare();
 	
-	if(subGpExclusion())
+	if(subGpExclusion()) // easy
 		level += 1;
 
-	if(twinExclusion())
-		level += 2;
+	if(twinExclusion()) // med
+		level += 1;
 
+	bool sub = false, sq =  false, be = false, tw = false;
 	do
 	{
-		if(twinExclusion())
-			level += 1;
-	}
-	while(subGpExclusion() || onlySquare() || basicElimination());
+		sub = subGpExclusion();
+		sq = onlySquare();
+		be =basicElimination();
+		tw = twinExclusion();
+	}while (sub || sq || be || tw); // split for debugging
 
-	if(!alreadySolved())
-		level += 4;
+	if(alternatePairEx()) // med hard // triplet!! & alt pair ex!!!
+		level = 10; 
 
-	if(level < 5)
+	while(subGpExclusion() || onlySquare() || basicElimination() || twinExclusion() || alternatePairEx());
+
+	if(!alreadySolved()) // crazy hard
+		level += 3;
+
+	if(level < 3)
+		level = 0; // too easy
+	else if(level < 6)
 		level = 1; // easy
-	else if(level < 10)
-		level = 2;
-	else
+	else if(level < 9)
+		level = 2; // med
+	else if(level < 12)
 		level = 3; // hard
+	else
+		level = 4; // extra hard
 	
 	copyGrid(tempGrid, grid);
 
